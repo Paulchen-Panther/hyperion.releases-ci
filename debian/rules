@@ -17,6 +17,7 @@ else
 	QT_DEPS := libqt5network5,libqt5widgets5,libqt5x11extras5,libqt5sql5,libqt5serialport5,libqt5sql5-sqlite,
 	QT_VERSION := 5
 endif
+$(info The following Qt$(QT_VERSION) dependencies are used: $(QT_DEPS))
 
 FIND_DEPENDS = $(shell \
 	PACKAGES=(); \
@@ -58,8 +59,6 @@ binary:
 	cp -rf cmake/package-scripts/* $(TARGET)/DEBIAN/
 	chmod 0775 $(TARGET)/DEBIAN/*
 	dpkg-gencontrol -phyperion "-Vdist:Depends=$(QT_DEPS)$(DETERMINED_DEPS)"
-	@echo About to make distribution files $(QT_DEPS)
-	$(info The following Qt$(QT_VERSION) dependencies are used: $(QT_DEPS))
 	dpkg-deb --build $(TARGET) ..
 
 clean:
