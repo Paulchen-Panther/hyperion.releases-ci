@@ -17,7 +17,6 @@ else
 	QT_DEPS := libqt5network5,libqt5widgets5,libqt5x11extras5,libqt5sql5,libqt5serialport5,libqt5sql5-sqlite,
 	QT_VERSION := 5
 endif
-$(info The following Qt$(QT_VERSION) dependencies are used: $(QT_DEPS))
 
 FIND_DEPENDS = $(shell \
 	PACKAGES=(); \
@@ -48,6 +47,7 @@ ifeq ($(shell dpkg-vendor --query Vendor),Ubuntu)
 endif
 
 build:
+	$(info The following Qt$(QT_VERSION) dependencies are used: $(QT_DEPS))
 	[ -d $(BUILDDIR) ] || mkdir -p $(BUILDDIR)
 	cd $(BUILDDIR); cmake -G Ninja $(CMAKE_ENVIRONMENT) -DCMAKE_INSTALL_PREFIX=../$(TARGET)/usr .. && ninja
 
