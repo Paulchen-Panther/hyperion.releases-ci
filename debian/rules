@@ -58,7 +58,7 @@ binary:
 	cp -rf cmake/package-scripts/* $(TARGET)/DEBIAN/
 	chmod 0775 $(TARGET)/DEBIAN/*
 	dpkg-gencontrol -phyperion "-Vdist:Depends=$(QT_DEPS)$(DETERMINED_DEPS)"
-	echo "The following Qt$(QT_VERSION) dependencies are used: $(QT_DEPS)"
+	$(info The following Qt$(QT_VERSION) dependencies are used: $(QT_DEPS))
 	dpkg-deb --build $(TARGET) ..
 
 clean:
