@@ -36,7 +36,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [
+          { distribution: ubuntu, codename: jammy,    description: Ubuntu 22.04 (Jammy Jellyfish), qt_version: '5' },
           { distribution: ubuntu, codename: jammy,    description: Ubuntu 22.04 (Jammy Jellyfish), qt_version: '6' },
+          { distribution: ubuntu, codename: noble,    description: Ubuntu 24.04 (Noble Numbat),    qt_version: '5' },
           { distribution: ubuntu, codename: noble,    description: Ubuntu 24.04 (Noble Numbat),    qt_version: '6' }
         ]
         architecture: [ [ amd64, linux/amd64  ] ]
