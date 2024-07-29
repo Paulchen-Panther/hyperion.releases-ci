@@ -9,13 +9,12 @@ TARGET := debian/tmp
 REQUIRED_DEPS := libusb libasound libmbedtls libturbojpeg libcec
 
 # get qt version and set qt deps depending on version
-QT6_PACKAGE_VERSION := $(shell dpkg-query -W -f '$${Version}' libqt6widgets6 2>/dev/null || echo 0)
+QT6_PACKAGE_VERSION := $(shell dpkg-query -W -f '$${Version}' libqt6widgets6* 2>/dev/null || echo 0)
+$(info QT6_PACKAGE_VERSION: $(QT6_PACKAGE_VERSION))
 ifeq (ok,$(shell dpkg --compare-versions "$(QT6_PACKAGE_VERSION)" "ge" "6.0" && echo ok))
 	QT_DEPS := qt6-qpa-plugins,libqt6network6,libqt6widgets6,libqt6sql6,libqt6serialport6,libqt6sql6-sqlite,
-	QT_VERSION := 6
 else
 	QT_DEPS := libqt5network5,libqt5widgets5,libqt5x11extras5,libqt5sql5,libqt5serialport5,libqt5sql5-sqlite,
-	QT_VERSION := 5
 endif
 
 FIND_DEPENDS = $(shell \
@@ -47,7 +46,7 @@ ifeq ($(shell dpkg-vendor --query Vendor),Ubuntu)
 endif
 
 build:
-	$(info The following Qt$(QT_VERSION) dependencies are used: $(QT_DEPS))
+	$(info The following Qt dependencies are used: $(QT_DEPS))
 	[ -d $(BUILDDIR) ] || mkdir -p $(BUILDDIR)
 	cd $(BUILDDIR); cmake -G Ninja $(CMAKE_ENVIRONMENT) -DCMAKE_INSTALL_PREFIX=../$(TARGET)/usr .. && ninja
 
