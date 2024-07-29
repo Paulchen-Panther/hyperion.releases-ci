@@ -36,31 +36,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [
-          { distribution: ubuntu, codename: focal,    description: Ubuntu 20.04 (Focal Fossa),     qt_version: '5' }, # Qt 6 not available
           { distribution: ubuntu, codename: jammy,    description: Ubuntu 22.04 (Jammy Jellyfish), qt_version: '6' },
-          { distribution: ubuntu, codename: noble,    description: Ubuntu 24.04 (Noble Numbat),    qt_version: '6' },
-          { distribution: debian, codename: buster,   description: Debian 10.x (Buster),           qt_version: '5' }, # Qt 6 not available
-          { distribution: debian, codename: bullseye, description: Debian 11.x (Bullseye),         qt_version: '5' }, # Qt 6 only available from bullseye-backports
-          { distribution: debian, codename: bookworm, description: Debian 12.x (Bookworm),         qt_version: '6' },
-          { distribution: debian, codename: trixie,   description: Debian 13.x (Trixie),           qt_version: '6' }
+          { distribution: ubuntu, codename: noble,    description: Ubuntu 24.04 (Noble Numbat),    qt_version: '6' }
         ]
-        architecture: [
-          [ amd64, linux/amd64  ],
-          [ arm64, linux/arm64  ],
-          [ armhf, linux/arm/v6 ],
-          [ armhf, linux/arm/v7 ]
-        ]
-        exclude:
-          - os: { distribution: ubuntu }
-            architecture: [ armhf, linux/arm/v6 ]
-          - os: { distribution: debian, codename: buster, }
-            architecture: [ armhf, linux/arm/v7 ]
-          - os: { distribution: debian, codename: bullseye, }
-            architecture: [ armhf, linux/arm/v7 ]
-          - os: { distribution: debian, codename: bookworm, }
-            architecture: [ armhf, linux/arm/v7 ]
-          - os: { distribution: debian, codename: trixie, } # Trixie armv6 not available yet (https://hub.docker.com/r/balenalib/rpi-raspbian/tags)
-            architecture: [ armhf, linux/arm/v6 ]
+        architecture: [ [ amd64, linux/amd64  ] ]
 
     steps:
       - name: ⬇ Checkout hyperion.ng
@@ -119,12 +98,4 @@ jobs:
             cp ../hyperion_*.deb /deploy"
         env:
           DOCKER_IMAGE: ${{ matrix.os.qt_version == '6' && format('{0}-qt6', matrix.os.codename) || matrix.os.codename }}
-
-      - name: 📦 Upload
-        if: ${{ inputs.upload }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ format('artifact-{0}_{1}_{2}{3}', matrix.os.distribution, matrix.os.codename, matrix.architecture[0], matrix.os.qt_version  == '6' && '_qt6' || '')}}
-          path: deploy
-          retention-days: 1
           

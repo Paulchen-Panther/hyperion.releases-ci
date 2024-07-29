@@ -6,7 +6,7 @@ run-name: |
 on:
   push:
     branches:
-      - 'main'
+      - 'dpkg'
   pull_request:
     branches:
       - 'main'
@@ -15,19 +15,4 @@ jobs:
   deb_build:
     name: 👷 Build DEB Packages
     uses: ./.github/workflows/build_deb.yml
-    secrets: inherit
-    with:
-      upload: true
-
-  rpm_build:
-    name: 👷 Build RPM Packages
-    uses: ./.github/workflows/build_rpm.yml
-    secrets: inherit
-    with:
-      upload: true
-
-  publish_test:
-    name: 🚀 Create Repository Structure (Test)
-    needs: [ deb_build, rpm_build ]
-    uses: ./.github/workflows/publish_deb_rpm.yml
     secrets: inherit
