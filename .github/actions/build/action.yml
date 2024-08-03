@@ -46,7 +46,7 @@ runs:
             ghcr.io/${{ inputs.ghcr }}/${{ inputs.distribution }}:${{ inputs.qtVersion == '6' && format('{0}-qt6', inputs.codename) || inputs.codename }} \
             /bin/bash -c "cd /source && \
             git config --global --add safe.directory '*' && \
-            mkdir -p debian/source && echo '${$(<.version)/*-/3.0 (quilt)/3.0 (native)}' > debian/source/format && echo 10 > debian/compat && \
+            mkdir -p debian/source && $(echo '${$(<.version)/*-/3.0 (quilt)/3.0 (native)}') > debian/source/format && echo 10 > debian/compat && \
             dch --create --distribution ${{ inputs.codename }} --package 'hyperion' -v '$(cat .version)~${{ inputs.codename }}' '${{ github.event.commits[0].message }}' && \
             cp -fr LICENSE debian/copyright && \
             sed 's/@ARCHITECTURE@/${{ inputs.architecture }}/g; s/@STANDARDS_VERSION@/$(echo ${$(<.version)%[-+]*})/g' debian/control.in > debian/control && \
