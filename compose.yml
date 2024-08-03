@@ -1,5 +1,3 @@
-version: '3.3'
-
 services:
   hyperion:
     image: "ghcr.io/hyperion-project/${distribution}:${codename}"
