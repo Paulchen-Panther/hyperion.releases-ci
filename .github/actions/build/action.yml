@@ -36,20 +36,26 @@ runs:
       shell: bash
       working-directory: ${{ inputs.workingDirectory }}
       run: |
+        VERSION=$(cat .version)
         mkdir -p "deploy"
-        echo VERSION=$(cat .version) >> $GITHUB_ENV
         if [[ ${{ inputs.distribution }} == @(debian|ubuntu) ]]; then
+          if [[ $VERSION == *"-"* ]]; then
+            DEBIAN_FORMAT='3.0 (quilt)'
+          else
+            DEBIAN_FORMAT='3.0 (native)'
+          fi
           docker run --rm --platform=${{ inputs.dockerArchitecture }} \
             -v "${{ inputs.workingDirectory }}/deploy:/deploy" \
             -v "${{ inputs.workingDirectory }}:/source:rw" \
             ghcr.io/${{ inputs.ghcr }}/${{ inputs.distribution }}:${{ inputs.qtVersion == '6' && format('{0}-qt6', inputs.codename) || inputs.codename }} \
             /bin/bash -c "cd /source && \
             git config --global --add safe.directory '*' && \
-            mkdir -p debian/source && echo ${{ contains(env.VERSION), '-') && '3.0 (quilt)' || '3.0 (native)' }} > debian/source/format && echo 10 > debian/compat && \
+            mkdir -p debian/source && echo '$(echo ${DEBIAN_FORMAT})' > debian/source/format && echo 10 > debian/compat && \
             cat debian/source/format && \
-            dch --create --distribution ${{ inputs.codename }} --package 'hyperion' -v '$(cat .version)~${{ inputs.codename }}' '${{ github.event.commits[0].message }}' && \
+            dch --create --distribution ${{ inputs.codename }} --package 'hyperion' -v '$(echo ${VERSION})~${{ inputs.codename }}' '${{ github.event.commits[0].message }}' && \
             cp -fr LICENSE debian/copyright && \
-            sed 's/@ARCHITECTURE@/${{ inputs.architecture }}/g; s/@STANDARDS_VERSION@/${VERSION%[-+]*}/g' debian/control.in > debian/control && \
+            sed 's/@ARCHITECTURE@/${{ inputs.architecture }}/g; s/@STANDARDS_VERSION@/$(echo ${VERSION%[-+]*})/g' debian/control.in > debian/control && \
+            cat debian/control && \
             debuild -b -uc -us && \
             cp ../hyperion_*.deb ./deploy"
         else
@@ -61,7 +67,7 @@ runs:
             /bin/bash -c "tar -czf rpmbuild/SOURCES/hyperion.ng.tar.gz hyperion.ng/ && \
             cp -f hyperion.ng/rpmbuild/hyperion.spec.in rpmbuild/SPECS/hyperion.spec && \
             rpmdev-bumpspec --comment='${{ github.event.commits[0].message }}' --userstring='${{ env.ACTOR }}' rpmbuild/SPECS/hyperion.spec && \
-            rpmbuild -ba --define '_version $(cat .version)' rpmbuild/SPECS/hyperion.spec --clean && \
+            rpmbuild -ba --define '_version $(echo ${VERSION})' rpmbuild/SPECS/hyperion.spec --clean && \
             cp -fv rpmbuild/RPMS/$(uname -m)/hyperion* /deploy"
         fi
       env:
