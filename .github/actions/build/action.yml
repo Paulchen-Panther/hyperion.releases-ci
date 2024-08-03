@@ -33,11 +33,11 @@ runs:
   using: composite
   steps:
     - name: Building Hyperion
-      if: inputs.distribution == 'debian' || inputs.distribution == 'ubuntu'
       shell: bash
       working-directory: ${{ inputs.workingDirectory }}
       run: |
         mkdir -p "deploy"
+        echo VERSION=$(cat .version) >> $GITHUB_ENV
         if [[ ${{ inputs.distribution }} == @(debian|ubuntu) ]]; then
           docker run --rm --platform=${{ inputs.dockerArchitecture }} \
             -v "${{ inputs.workingDirectory }}/deploy:/deploy" \
@@ -45,11 +45,11 @@ runs:
             ghcr.io/${{ inputs.ghcr }}/${{ inputs.distribution }}:${{ inputs.qtVersion == '6' && format('{0}-qt6', inputs.codename) || inputs.codename }} \
             /bin/bash -c "cd /source && \
             git config --global --add safe.directory '*' && \
-            mkdir -p debian/source && echo '${$(<.version)/*-/3.0 (quilt)/3.0 (native)}' > debian/source/format && echo 10 > debian/compat && \
+            mkdir -p debian/source && echo ${{ contains(env.VERSION), '-') && '3.0 (quilt)' || '3.0 (native)' }} > debian/source/format && echo 10 > debian/compat && \
             cat debian/source/format && \
             dch --create --distribution ${{ inputs.codename }} --package 'hyperion' -v '$(cat .version)~${{ inputs.codename }}' '${{ github.event.commits[0].message }}' && \
             cp -fr LICENSE debian/copyright && \
-            sed 's/@ARCHITECTURE@/${{ inputs.architecture }}/g; s/@STANDARDS_VERSION@/$(echo ${$(<.version)%[-+]*})/g' debian/control.in > debian/control && \
+            sed 's/@ARCHITECTURE@/${{ inputs.architecture }}/g; s/@STANDARDS_VERSION@/${VERSION%[-+]*}/g' debian/control.in > debian/control && \
             debuild -b -uc -us && \
             cp ../hyperion_*.deb ./deploy"
         else
