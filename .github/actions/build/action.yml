@@ -58,7 +58,7 @@ runs:
             -w "/root" \
             -v "${{ inputs.workingDirectory }}/deploy:/deploy" \
             -v "${{ inputs.workingDirectory }}:/root/hyperion.ng:rw" \
-            ghcr.io/${{ inputs.ghcr }}/$(echo '${{ inputs.distribution }}' | tr '[:upper:]' '[:lower:]'):${{ inputs.codename }}-qt6 \
+            ghcr.io/${{ inputs.ghcr }}/${{ inputs.distribution }}:${{ inputs.qtVersion == '6' && format('{0}-qt6', inputs.codename) || inputs.codename }} \
             /bin/bash -c "tar -czf rpmbuild/SOURCES/hyperion.ng.tar.gz hyperion.ng/ && \
             cp -f hyperion.ng/rpmbuild/hyperion.spec.in rpmbuild/SPECS/hyperion.spec && \
             rpmdev-bumpspec --comment='${{ github.event.commits[0].message }}' --userstring='${{ env.ACTOR }}' rpmbuild/SPECS/hyperion.spec && \

@@ -5,17 +5,22 @@ on:
     inputs:
       repo_checkout:
         type: string
-        description: The GitHub Repository to checkout
-        default: hyperion-project
+        description: The GitHub Repository to checkout (lower case)
+        default: hyperion-project/hyperion.ng
         required: false
       head_sha:
         type: string
-        description: The branch, tag or SHA to checkout
+        description: The branch, tag or SHA to checkout (case sensitive)
         default: master
         required: false
       nightly:
         type: boolean
         description: Nightly build
+        default: false
+        required: false
+      install_run_check:
+        type: boolean
+        description: Install & Run Check
         default: false
         required: false
       upload:
@@ -25,29 +30,33 @@ on:
         required: false
 
 env:
-  repository: ${{ inputs.repo_checkout }}
   ghcr: hyperion-project
 
 jobs:
   build:
-    name: 🐧 ${{ matrix.os.distribution }} ${{ matrix.os.version }} (${{ matrix.architecture[0] }})
+    name: 🐧 ${{ matrix.os.description }} (${{ matrix.architecture[0] }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         os: [
-          { distribution: Fedora, version: 39 },
-          { distribution: Fedora, version: 40 }
+          { distribution: fedora, version: 39, description: Fedora 39, qt_version: '6' },
+          { distribution: fedora, version: 40, description: Fedora 40, qt_version: '6' }
         ]
         architecture: [
           [ amd64, linux/amd64 ]
         ]
 
     steps:
+      # - name: 📥 Install & Run Check
+      #   if: ${{ inputs.install_run_check }}
+      #   id: install_run_check
+      #   run: |
+
       - name: ⬇ Checkout hyperion.ng
         uses: actions/checkout@v4
         with:
-          repository: ${{ env.repository }}/hyperion.ng
+          repository: ${{ inputs.repo_checkout }}
           ref: ${{ inputs.head_sha || 'master' }}
           submodules: recursive
 
@@ -71,6 +80,16 @@ jobs:
           echo '::endgroup::'
 
       - name: 👷 Build
+        uses: ./releases-ci/.github/actions/build
+        with:
+          distribution: ${{ matrix.os.distribution }}
+          codename: ${{ matrix.os.version }}
+          architecture: ${{ matrix.architecture[0] }}
+          qtVersion: ${{ matrix.os.qt_version }}
+          ghcr: ${{ env.ghcr }}
+          dockerArchitecture: ${{ matrix.architecture[1] }}
+
+      - name: 👷 Build
         shell: bash
         run: |
           echo '::group::Building Hyperion'
@@ -90,11 +109,11 @@ jobs:
           ACTOR: "Hyperion Project <admin@hyperion-project.org>"
           COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
 
-      - name: 📦 Upload
-        if: ${{ inputs.upload }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ format('artifact-{0}_{1}_{2}_qt6', matrix.os.distribution, matrix.os.version, matrix.architecture[0] )}}
-          path: deploy
-          retention-days: 1
+      # - name: 📦 Upload
+      #   if: ${{ inputs.upload }}
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ${{ format('artifact-{0}_{1}_{2}_qt6', matrix.os.distribution, matrix.os.version, matrix.architecture[0] )}}
+      #     path: deploy
+      #     retention-days: 1
           
