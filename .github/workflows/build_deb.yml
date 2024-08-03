@@ -72,14 +72,24 @@ jobs:
         if: ${{ inputs.install_run_check }}
         id: install_run_check
         working-directory: ./releases-ci/
+        shell: bash
         run: |
+          echo "force_build=false" >> $GITHUB_OUTPUT
           docker compose up -d --no-build --wait
-          set -x
-          echo Wait 10s for Hyperion to start... && sleep 10s
-          docker compose logs
-          docker compose ps
-          docker inspect --format='{{json .Name}} - {{json .State.Health.Status}}' $(docker compose ps -q)
-          echo "force_build=false" >> $GITHUB_OUTPUT   
+          i=0
+          while [ $i -le 10 ]; do
+            i=$((i+1))
+            if docker container inspect -f '{{.State.Running}}' hyperion; then
+              echo "force_build=true" >> $GITHUB_OUTPUT
+              docker compose logs
+              docker compose ps
+              docker inspect --format='{{json .State.Health}}' $(docker compose ps -q)
+            else
+              echo "Hyperion could not be found yet, try again in 10 seconds..."
+              sleep 10
+            fi
+          done
+          docker compose down
         env:
           distribution: ${{ matrix.os.distribution }}
           codename: ${{ matrix.os.codename }}
