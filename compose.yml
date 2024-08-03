@@ -6,8 +6,7 @@ services:
       adduser -q --uid ${UID:-1000} --gid ${GID:-1000} --disabled-password --no-create-home hyperion || true &&
       mkdir -p /config &&
       chown ${UID:-1000}:${GID:-1000} /config &&
-      curl -sSL https://releases.hyperion-project.org/install | bash
-      # sudo -u hyperion /usr/bin/hyperiond -v --service -u /config"
+      curl -sSL https://releases.hyperion-project.org/install | bash"
     ports:
       - "19400:19400"
       - "19444:19444"
