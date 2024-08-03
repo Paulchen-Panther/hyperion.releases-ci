@@ -19,7 +19,7 @@ services:
     healthcheck:
       test: ["CMD", "curl", "-sf", "http://localhost:8090/"]
       interval: 5s
-      timeout: 2s
+      timeout: 20s
       retries: 10
     restart: always
 volumes:
