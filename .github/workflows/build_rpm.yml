@@ -29,9 +29,6 @@ on:
         default: false
         required: false
 
-env:
-  ghcr: hyperion-project
-
 jobs:
   build:
     name: 🐧 ${{ matrix.os.description }} (${{ matrix.architecture[0] }})
@@ -54,6 +51,7 @@ jobs:
       #   run: |
 
       - name: ⬇ Checkout hyperion.ng
+        if: ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.repo_checkout }}
@@ -61,17 +59,19 @@ jobs:
           submodules: recursive
 
       - name: ⬇ Checkout hyperion.releases-ci
+        if: ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
         uses: actions/checkout@v4
         with:
           path: releases-ci
 
       - name: 🔧 Prepare
+        if: ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
         run: |
           echo '::group::Checking the version number'
             if [[ "${{ inputs.nightly }}" = true ]]; then
               echo "$(tr -d '\n' < .version | sed s/-/_/g)+nightly$(date '+%Y%m%d')${{ inputs.head_sha }}" > .version
             else
-              echo VERSION=$(tr -d '\n' < .version | sed s/-/_/g) >> $GITHUB_ENV
+              tr -d '\n' < .version > temp && mv temp .version
             fi
           echo '::endgroup::'
 
@@ -80,16 +80,17 @@ jobs:
           echo '::endgroup::'
 
       - name: 👷 Build
+        if: ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
         uses: ./releases-ci/.github/actions/build
         with:
           distribution: ${{ matrix.os.distribution }}
           codename: ${{ matrix.os.version }}
           architecture: ${{ matrix.architecture[0] }}
           qtVersion: ${{ matrix.os.qt_version }}
-          ghcr: ${{ env.ghcr }}
           dockerArchitecture: ${{ matrix.architecture[1] }}
 
       - name: 👷 Build
+        if: ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
         shell: bash
         run: |
           echo '::group::Building Hyperion'
@@ -109,11 +110,11 @@ jobs:
           ACTOR: "Hyperion Project <admin@hyperion-project.org>"
           COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
 
-      # - name: 📦 Upload
-      #   if: ${{ inputs.upload }}
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: ${{ format('artifact-{0}_{1}_{2}_qt6', matrix.os.distribution, matrix.os.version, matrix.architecture[0] )}}
-      #     path: deploy
-      #     retention-days: 1
+      - name: 📦 Upload
+        if: ${{ inputs.upload }} && ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ format('artifact-{0}_{1}_{2}_qt6', matrix.os.distribution, matrix.os.version, matrix.architecture[0] )}}
+          path: ${{ github.workspace }}/deploy
+          retention-days: 1
           

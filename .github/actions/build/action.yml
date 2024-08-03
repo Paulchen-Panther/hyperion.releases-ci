@@ -36,8 +36,8 @@ runs:
       shell: bash
       working-directory: ${{ inputs.workingDirectory }}
       run: |
-        VERSION=$(cat .version)
         mkdir -p "deploy"
+        VERSION=$(cat .version)
         if [[ ${{ inputs.distribution }} == @(debian|ubuntu) ]]; then
           docker run --rm --platform=${{ inputs.dockerArchitecture }} \
             -v "${{ inputs.workingDirectory }}/deploy:/deploy" \
@@ -62,7 +62,7 @@ runs:
             /bin/bash -c "tar -czf rpmbuild/SOURCES/hyperion.ng.tar.gz hyperion.ng/ && \
             cp -f hyperion.ng/rpmbuild/hyperion.spec.in rpmbuild/SPECS/hyperion.spec && \
             rpmdev-bumpspec --comment='${{ github.event.commits[0].message }}' --userstring='${{ env.ACTOR }}' rpmbuild/SPECS/hyperion.spec && \
-            rpmbuild -ba --define '_version $(echo ${VERSION})' rpmbuild/SPECS/hyperion.spec --clean && \
+            rpmbuild -ba --define '_version $(echo ${VERSION} | sed s/-/_/g)' rpmbuild/SPECS/hyperion.spec --clean && \
             cp -fv rpmbuild/RPMS/$(uname -m)/hyperion* /deploy"
         fi
       env:

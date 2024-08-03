@@ -21,16 +21,13 @@ on:
       install_run_check:
         type: boolean
         description: Install & Run Check
-        default: false
+        default: true
         required: false
       upload:
         type: boolean
         description: Upload Artifacts
         default: false
         required: false
-
-env:
-  ghcr: hyperion-project
 
 jobs:
   build:
@@ -66,24 +63,37 @@ jobs:
           - os: { distribution: debian, codename: trixie, } # Debian Trixie armv6 not available yet (https://hub.docker.com/r/balenalib/rpi-raspbian/tags)
             architecture: [ armhf, linux/arm/v6 ]
     steps:
-      # - name: 📥 Install & Run Check
-      #   if: ${{ inputs.install_run_check }}
-      #   id: install_run_check
-      #   run: |
+      - name: ⬇ Checkout hyperion.releases-ci
+        uses: actions/checkout@v4
+        with:
+          path: releases-ci
+
+      - name: 📥 Install & Run Check
+        if: ${{ inputs.install_run_check }}
+        id: install_run_check
+        working-directory: ./releases-ci/
+        run: |
+          docker compose up -d --quiet-pull --no-build --wait
+          set -x
+          echo Wait 10s for Hyperion to start... && sleep 10s
+          docker compose logs
+          docker compose ps
+          docker inspect --format='{{json .Name}} - {{json .State.Health.Status}}' $(docker compose ps -q)
+          echo "force_build=false" >> $GITHUB_OUTPUT   
+        env:
+          distribution: ${{ matrix.os.distribution }}
+          codename: ${{ matrix.os.codename }}
 
       - name: ⬇ Checkout hyperion.ng
+        if: ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.repo_checkout }}
           ref: ${{ inputs.head_sha || 'master' }}
           submodules: recursive
 
-      - name: ⬇ Checkout hyperion.releases-ci
-        uses: actions/checkout@v4
-        with:
-          path: releases-ci
-
       - name: 🔧 Prepare
+        if: ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
         run: |
           echo '::group::Checking the version number'
             if [[ "${{ inputs.nightly }}" = true ]]; then
@@ -98,20 +108,19 @@ jobs:
           echo '::endgroup::'
 
       - name: 👷 Build
+        if: ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
         uses: ./releases-ci/.github/actions/build
         with:
           distribution: ${{ matrix.os.distribution }}
           codename: ${{ matrix.os.codename }}
           architecture: ${{ matrix.architecture[0] }}
           qtVersion: ${{ matrix.os.qt_version }}
-          ghcr: ${{ env.ghcr }}
           dockerArchitecture: ${{ matrix.architecture[1] }}
 
-      # - name: 📦 Upload
-      #   if: ${{ inputs.upload }} && ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: ${{ format('artifact-{0}_{1}_{2}{3}', matrix.os.distribution, matrix.os.codename, matrix.architecture[0], matrix.os.qt_version  == '6' && '_qt6' || '')}}
-      #     path: deploy
-      #     retention-days: 1
-          
+      - name: 📦 Upload
+        if: ${{ inputs.upload }} && ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ format('artifact-{0}_{1}_{2}{3}', matrix.os.distribution, matrix.os.codename, matrix.architecture[0], matrix.os.qt_version  == '6' && '_qt6' || '')}}
+          path: ${{ github.workspace }}/deploy
+          retention-days: 1

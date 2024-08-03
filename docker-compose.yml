@@ -1,0 +1,28 @@
+version: '3.3'
+
+services:
+  hyperion:
+    image: "ghcr.io/hyperion-project/${distribution}:${codename}"
+    container_name: hyperion
+    command: bash -c "groupadd -f hyperion || true &&
+      adduser -q --uid ${UID:-1000} --gid ${GID:-1000} --disabled-password --no-create-home hyperion || true &&
+      mkdir -p /config &&
+      chown ${UID:-1000}:${GID:-1000} /config &&
+      curl -sSL https://releases.hyperion-project.org/install | bash
+      # sudo -u hyperion /usr/bin/hyperiond -v --service -u /config"
+    ports:
+      - "19400:19400"
+      - "19444:19444"
+      - "19445:19445"
+      - "8090:8090"
+      - "8092:8092"
+    volumes:
+      - hyperion-config:/config
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8090/"]
+      interval: 5s
+      timeout: 2s
+      retries: 10
+    restart: always
+volumes:
+  hyperion-config:
