@@ -18,6 +18,11 @@ on:
         description: Nightly build
         default: false
         required: false
+      install_run_check:
+        type: boolean
+        description: Install & Run Check from APT Repository
+        default: false
+        required: false
       upload:
         type: boolean
         description: Upload Artifacts
@@ -63,6 +68,12 @@ jobs:
             architecture: [ armhf, linux/arm/v6 ]
 
     steps:
+
+      # - name: 📥 Install & Run Check
+      #   if: ${{ inputs.install_run_check }}
+      #   id: install_run_check
+      #   run: |
+
       - name: ⬇ Checkout hyperion.ng
         uses: actions/checkout@v4
         with:
@@ -89,42 +100,21 @@ jobs:
             cp -r releases-ci/debian ${GITHUB_WORKSPACE}/
           echo '::endgroup::'
 
-          echo '::group::Generate environment variables'
-            VERSION=$(cat .version)
-            echo VERSION=${VERSION} >> $GITHUB_ENV
-            if [[ $VERSION == *"-"* ]]; then
-              echo STANDARDS_VERSION=$(echo ${VERSION%-*}) >> $GITHUB_ENV
-              echo DEBIAN_FORMAT='3.0 (quilt)' >> $GITHUB_ENV
-            else
-              echo STANDARDS_VERSION=$(echo ${VERSION%+*}) >> $GITHUB_ENV
-              echo DEBIAN_FORMAT='3.0 (native)' >> $GITHUB_ENV
-            fi
-          echo '::endgroup::'
-
       - name: 👷 Build
-        shell: bash
-        run: |
-          mkdir -p "${GITHUB_WORKSPACE}/deploy"
-          docker run --rm --platform=${{ matrix.architecture[1] }} \
-            -v "${GITHUB_WORKSPACE}/deploy:/deploy" \
-            -v "${GITHUB_WORKSPACE}:/source:rw" \
-            ghcr.io/${{ env.ghcr }}/${{ matrix.os.distribution }}:${{ env.DOCKER_IMAGE }} \
-            /bin/bash -c "cd /source && \
-            git config --global --add safe.directory '*' && \
-            mkdir -p debian/source && echo '${{ env.DEBIAN_FORMAT }}' > debian/source/format && echo 10 > debian/compat && \
-            dch --create --distribution ${{ matrix.os.codename }} --package 'hyperion' -v '${{ env.VERSION }}~${{ matrix.os.codename }}' '${{ github.event.commits[0].message }}' && \
-            cp -fr LICENSE debian/copyright && \
-            sed 's/@ARCHITECTURE@/${{ matrix.architecture[0] }}/g; s/@STANDARDS_VERSION@/${{ env.STANDARDS_VERSION }}/g' debian/control.in > debian/control && \
-            debuild -b -uc -us && \
-            cp ../hyperion_*.deb /deploy"
-        env:
-          DOCKER_IMAGE: ${{ matrix.os.qt_version == '6' && format('{0}-qt6', matrix.os.codename) || matrix.os.codename }}
-
-      - name: 📦 Upload
-        if: ${{ inputs.upload }}
-        uses: actions/upload-artifact@v4
+        uses: ./.github/actions/build
         with:
-          name: ${{ format('artifact-{0}_{1}_{2}{3}', matrix.os.distribution, matrix.os.codename, matrix.architecture[0], matrix.os.qt_version  == '6' && '_qt6' || '')}}
-          path: deploy
-          retention-days: 1
+          distribution: ${{ matrix.os.distribution }}
+          codename: ${{ matrix.os.codename }}
+          architecture: ${{ matrix.architecture[0] }}
+          qtVersion: ${{ matrix.os.qt_version }}
+          ghcr: ${{ env.ghcr }}
+          dockerArchitecture: ${{ matrix.architecture[1] }}
+
+      # - name: 📦 Upload
+      #   if: ${{ inputs.upload }} && ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: ${{ format('artifact-{0}_{1}_{2}{3}', matrix.os.distribution, matrix.os.codename, matrix.architecture[0], matrix.os.qt_version  == '6' && '_qt6' || '')}}
+      #     path: deploy
+      #     retention-days: 1
           

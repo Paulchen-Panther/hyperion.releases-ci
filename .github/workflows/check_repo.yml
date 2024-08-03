@@ -1,0 +1,7 @@
+name: Check Repositories
+run-name: '⏰ Check Repositories (Install & Run)'
+
+on:
+  schedule:
+    - cron: '0 0 * * 7'
+
