@@ -39,18 +39,13 @@ runs:
         VERSION=$(cat .version)
         mkdir -p "deploy"
         if [[ ${{ inputs.distribution }} == @(debian|ubuntu) ]]; then
-          if [[ $VERSION == *"-"* ]]; then
-            DEBIAN_FORMAT='3.0 (quilt)'
-          else
-            DEBIAN_FORMAT='3.0 (native)'
-          fi
           docker run --rm --platform=${{ inputs.dockerArchitecture }} \
             -v "${{ inputs.workingDirectory }}/deploy:/deploy" \
             -v "${{ inputs.workingDirectory }}:/source:rw" \
             ghcr.io/${{ inputs.ghcr }}/${{ inputs.distribution }}:${{ inputs.qtVersion == '6' && format('{0}-qt6', inputs.codename) || inputs.codename }} \
             /bin/bash -c "cd /source && \
             git config --global --add safe.directory '*' && \
-            mkdir -p debian/source && echo '$(echo ${DEBIAN_FORMAT})' > debian/source/format && echo 10 > debian/compat && \
+            mkdir -p debian/source && echo $([[ $VERSION == *-* ]] && echo '3.0 (quilt)' || echo '3.0 (native)') > debian/source/format && echo 10 > debian/compat && \
             cat debian/source/format && \
             dch --create --distribution ${{ inputs.codename }} --package 'hyperion' -v '$(echo ${VERSION})~${{ inputs.codename }}' '${{ github.event.commits[0].message }}' && \
             cp -fr LICENSE debian/copyright && \
