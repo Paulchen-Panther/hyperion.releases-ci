@@ -1,7 +1,7 @@
 services:
   hyperion:
     image: "ghcr.io/hyperion-project/${distribution}:${codename}"
-    platform: ${platform}"
+    platform: "${platform}"
     container_name: hyperion
     command: bash -c "groupadd -f hyperion || true &&
       adduser -q --uid ${UID:-1000} --gid ${GID:-1000} --disabled-password --no-create-home hyperion || true &&
