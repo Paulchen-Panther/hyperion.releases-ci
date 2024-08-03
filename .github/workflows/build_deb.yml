@@ -47,7 +47,9 @@ jobs:
           { distribution: debian, codename: buster,   description: Debian 10.x (Buster),           qt_version: '5' }, # Qt 6 not available
           { distribution: debian, codename: bullseye, description: Debian 11.x (Bullseye),         qt_version: '5' }, # Qt 6 only available from bullseye-backports
           { distribution: debian, codename: bookworm, description: Debian 12.x (Bookworm),         qt_version: '6' },
-          { distribution: debian, codename: trixie,   description: Debian 13.x (Trixie),           qt_version: '6' }
+          { distribution: debian, codename: trixie,   description: Debian 13.x (Trixie),           qt_version: '6' },
+          { distribution: fedora, codename: 39,       description: Fedora 39,                      qt_version: '6' },
+          { distribution: fedora, codename: 40,       description: Fedora 40,                      qt_version: '6' }
         ]
         architecture: [
           [ amd64, linux/amd64  ],
@@ -64,9 +66,16 @@ jobs:
             architecture: [ armhf, linux/arm/v7 ]
           - os: { distribution: debian, codename: bookworm, }
             architecture: [ armhf, linux/arm/v7 ]
-          - os: { distribution: debian, codename: trixie, } # Trixie armv6 not available yet (https://hub.docker.com/r/balenalib/rpi-raspbian/tags)
+          # Debian Trixie armv6 not available yet (https://hub.docker.com/r/balenalib/rpi-raspbian/tags)
+          - os: { distribution: debian, codename: trixie, }
             architecture: [ armhf, linux/arm/v6 ]
-
+          # Exclude all Fedora architectures except amd64
+          - os: { distribution: fedora }
+            architecture: [ arm64, linux/arm64 ]
+          - os: { distribution: fedora }
+            architecture: [ armhf, linux/arm/v6 ]
+          - os: { distribution: fedora }
+            architecture: [ armhf, linux/arm/v7 ]
     steps:
 
       # - name: 📥 Install & Run Check
