@@ -101,7 +101,7 @@ jobs:
           echo '::endgroup::'
 
       - name: 👷 Build
-        uses: ./.github/actions/build
+        uses: releases-ci/.github/actions/build
         with:
           distribution: ${{ matrix.os.distribution }}
           codename: ${{ matrix.os.codename }}
