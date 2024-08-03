@@ -73,7 +73,7 @@ jobs:
         id: install_run_check
         working-directory: ./releases-ci/
         run: |
-          docker compose up -d --quiet-pull --no-build --wait
+          docker compose up -d --no-build --wait
           set -x
           echo Wait 10s for Hyperion to start... && sleep 10s
           docker compose logs
@@ -83,6 +83,7 @@ jobs:
         env:
           distribution: ${{ matrix.os.distribution }}
           codename: ${{ matrix.os.codename }}
+          platform: ${{ matrix.architecture[1] }}
 
       - name: ⬇ Checkout hyperion.ng
         if: ${{ !inputs.install_run_check || steps.install_run_check.outputs.force_build  == 'true' }}
