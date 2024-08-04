@@ -81,7 +81,6 @@ jobs:
             i=$((i+1))
             if docker container inspect -f '{{.State.Running}}' hyperion; then
               echo "---> Docker Container is running. Try connecting to WebUI Port 8090 ..."
-              k
               until [ "$(curl --silent --show-error --connect-timeout 1 -I http://localhost:8090 | grep 'Hyperion')" ];
               do
                 echo "---> Hyperion is still starting up. try again in 5 seconds ..."
