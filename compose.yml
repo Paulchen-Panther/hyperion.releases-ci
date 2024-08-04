@@ -1,20 +1,19 @@
+name: hyperion
+
 services:
   hyperion:
     image: "ghcr.io/hyperion-project/${distribution}:${codename}"
     platform: "${platform}"
-    container_name: hyperion
-    command: bash -c "groupadd -f hyperion &&
-      (id -u hyperion &>/dev/null || adduser --uid ${UID:-1000} --gid ${GID:-1000} --no-create-home --disabled-password hyperion) &&
-      mkdir -p /config && chown ${UID:-1000}:${GID:-1000} /config &&
-      DEBIAN_FRONTEND=noninteractive apt-get update &&
-      DEBIAN_FRONTEND=noninteractive apt-get install -y wget gpg sudo dpkg lsb-release &&
+    pull_policy: always
+    environment:
+      - DEBIAN_FRONTEND=noninteractive
+    command: bash -c "apt-get update && apt-get install -y wget gpg sudo dpkg lsb-release &&
+      useradd --create-home --shell /bin/bash hyperion &&
       wget -qO /tmp/hyperion.pub.key https://apt.hyperion-project.org/hyperion.pub.key &&
       gpg --dearmor -o - /tmp/hyperion.pub.key > /usr/share/keyrings/hyperion.pub.gpg &&
       echo \"deb [arch=\$(dpkg --print-architecture) [signed-by=/usr/share/keyrings/hyperion.pub.gpg] https://apt.hyperion-project.org/ \$(lsb_release -cs) main\" > /etc/apt/sources.list.d/hyperion.list &&
-      DEBIAN_FRONTEND=noninteractive apt-get update &&
-      DEBIAN_FRONTEND=noninteractive apt-get install -y hyperion &&
-      apt-get clean &&
-      exec sudo -u hyperion /usr/bin/hyperiond -v --service -u /config"
+      apt-get update && apt-get install -y hyperion &&
+      sudo -u hyperion /usr/bin/hyperiond -v --service"
     ports:
       - "19400:19400"
       - "19444:19444"
@@ -22,7 +21,7 @@ services:
       - "8090:8090"
       - "8092:8092"
     volumes:
-      - hyperion-config:/config
+      - config:/home/hyperion:rw
     restart: unless-stopped
 volumes:
-  hyperion-config:
+  config:

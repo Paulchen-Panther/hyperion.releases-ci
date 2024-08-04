@@ -75,17 +75,22 @@ jobs:
         shell: bash
         run: |
           echo "force_build=false" >> $GITHUB_OUTPUT
-          docker compose up -d --no-build --wait
+          echo "---> Starting Install & Run Check"
+          docker compose up -d --wait
           i=0
           while [ $i -le 10 ]; do
             i=$((i+1))
             if docker container inspect -f '{{.State.Running}}' hyperion; then
+              echo "---> Docker Container is running. Try connecting to WebUI Port 8090 ..."
+              until [ "$(curl --silent --show-error --connect-timeout 1 -I http://localhost:8090 | grep 'Hyperion')" ];
+              do
+                echo "---> Hyperion is still starting up. We'll check the log until then ..."
+                docker compose logs hyperion
+                sleep 10
+              done
               echo "force_build=true" >> $GITHUB_OUTPUT
-              docker compose logs
-              docker compose ps
-              docker inspect --format='{{json .State.Health}}' $(docker compose ps -q)
             else
-              echo "Hyperion could not be found yet, try again in 10 seconds..."
+              echo "---> Hyperion service could not be found yet, try again in 10 seconds..."
               sleep 10
             fi
           done
