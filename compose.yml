@@ -7,7 +7,11 @@ services:
     pull_policy: always
     environment:
       - DEBIAN_FRONTEND=noninteractive
-    command: bash -c "set -x && apt-get update && apt-get install -y sudo gpg apt-transport-https lsb-release && curl -sSL https://releases.hyperion-project.org/install | bash -s -- --verbose --${distribution} ${codename}"
+    command: bash -c "set -x &&
+      apt-get update && apt-get install -y sudo gpg apt-transport-https lsb-release &&
+      useradd --create-home --shell /bin/bash hyperion &&
+      curl -sSL https://releases.hyperion-project.org/install | bash -s -- --verbose --${distribution} ${codename} &&
+      exec sudo -u hyperion /usr/bin/hyperion -v --service"
     ports:
       - "19400:19400"
       - "19444:19444"
