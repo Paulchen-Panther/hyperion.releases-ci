@@ -7,7 +7,7 @@ services:
     pull_policy: always
     environment:
       - DEBIAN_FRONTEND=noninteractive
-    command: bash -c "apt-get update && useradd --create-home --shell /bin/bash hyperion && curl -sSL https://releases.hyperion-project.org/install | bash -s -- -v"
+    command: bash -c "set -x && apt-get update && useradd --create-home --shell /bin/bash hyperion && curl -sSL https://releases.hyperion-project.org/install | bash -s -- -v"
     ports:
       - "19400:19400"
       - "19444:19444"
