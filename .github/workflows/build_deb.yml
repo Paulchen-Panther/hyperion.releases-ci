@@ -112,7 +112,6 @@ jobs:
         env:
           distribution: ${{ matrix.os.distribution }}
           codename: ${{ matrix.os.qt_version == '6' && format('{0}-qt6', matrix.os.codename) || matrix.os.codename }}
-          codebase: ${{ matrix.os.codename }}
           platform: ${{ matrix.architecture[1] }}
 
       - name: ⬇ Checkout hyperion.ng
