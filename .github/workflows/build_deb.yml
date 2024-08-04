@@ -78,8 +78,8 @@ jobs:
           STATUS=false
           docker compose up -d --wait
           i=0
-          until [ $i -gt 10 ]; do
-            ((i++))
+          while [ $i -le 10 ]; do
+            i=$((i+1))
             if docker container inspect -f '{{.State.Running}}' hyperion; then
               echo "---> Docker Container is running. Try connecting to WebUI Port 8090 ..."
               TIMEOUT=$((SECONDS + + 300 ))
