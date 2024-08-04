@@ -6,9 +6,9 @@ services:
     pull_policy: always
     environment:
       - DEBIAN_FRONTEND=noninteractive
-    command: /bin/bash -c "apt-get update && apt-get install -y -m sudo gpg apt-transport-https lsb-release "libqt6network6*" "libqt6widgets6*" "libqt6sql6*" &&
+    command: /bin/bash -c "apt-get update && apt-get install -y sudo gpg apt-transport-https lsb-release &&
       useradd --create-home --shell /bin/bash hyperion && chown hyperion:hyperion /home/hyperion &&
-      curl -sSL https://github.com/Paulchen-Panther/hyperion.releases-ci/blob/main/install.sh | bash &&
+      curl -sSL https://releases.hyperion-project.org/install | bash &&
       exec sudo -u hyperion /usr/bin/hyperiond -v --service"
     ports:
       - "19400:19400"
