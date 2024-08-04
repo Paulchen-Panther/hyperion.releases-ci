@@ -88,7 +88,7 @@ jobs:
                   echo "---> Timeout exeeded"
                   break
                 fi
-                echo -ne "---> Hyperion is still starting up, try again in 5 seconds ... ("${TIMEOUT}/${SECONDS}")"
+                echo -ne "---> Hyperion is still starting up, try again in 5 seconds ... (${TIMEOUT}/${SECONDS})"
                 sleep 1
               done
               if [ "$SECONDS" -lt "$TIMEOUT" ]; then
