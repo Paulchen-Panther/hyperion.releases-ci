@@ -190,7 +190,7 @@ function sudocmd() {
 function install_deb_package() {
 	debug "Start installation via Debian package ${_NIGHTLY}"
 	info "Installing dependencies..."
-	apt_get_install_pkgs gpg apt-transport-https libqt6network6* libqt6widgets6* libqt6sql6*
+	apt_get_install_pkgs gpg apt-transport-https
 
 	info "Integrate Repository..."
 	DOWNLOAD_GPG_KEY="mkdir -p '/etc/apt/keyrings/' && curl --silent --show-error --location "https://${_BASE_REPO_URI}/hyperion.pub.key" | gpg --dearmor --batch --yes -o /etc/apt/keyrings/hyperion.pub.gpg"
@@ -426,7 +426,7 @@ apt_get_install_pkgs() {
 	done
 	if [ "$missing" = "" ]; then
 		debug "Packages '$*' already installed!"
-	elif ! sudocmd "install required system dependencies" apt-get -qq install -y -m $missing; then
+	elif ! sudocmd "install required system dependencies" apt-get -qq install -y $missing; then
 		error "Installing apt packages failed.  Please run 'apt-get update' and try again."
 	fi
 }
