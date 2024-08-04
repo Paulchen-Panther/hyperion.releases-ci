@@ -9,7 +9,7 @@ services:
     command: /bin/bash -c "set -x &&
       apt-get update && apt-get install -y sudo gpg apt-transport-https lsb-release &&
       useradd --create-home --shell /bin/bash hyperion && chown hyperion:hyperion /home/hyperion &&
-      curl -sSL https://releases.hyperion-project.org/install | bash -s -- --verbose --${distribution} ${codename} &&
+      curl -sSL https://releases.hyperion-project.org/install | bash -s -- --verbose --${distribution} ${codebase} &&
       exec sudo -u hyperion /usr/bin/hyperiond -v --service"
     ports:
       - "19400:19400"
