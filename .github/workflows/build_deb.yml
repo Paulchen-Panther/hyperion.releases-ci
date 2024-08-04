@@ -88,6 +88,7 @@ jobs:
                 docker compose logs hyperion
                 sleep 3
               done
+              echo "---> Hyperion is up and running."
               echo "force_build=true" >> $GITHUB_OUTPUT
             else
               echo "---> Hyperion service could not be found yet, try again in 3 seconds ..."
