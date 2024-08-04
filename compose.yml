@@ -8,8 +8,8 @@ services:
       - DEBIAN_FRONTEND=noninteractive
     command: /bin/bash -c "apt-get update && apt-get install -y sudo gpg apt-transport-https lsb-release &&
       useradd --create-home --shell /bin/bash hyperion && chown hyperion:hyperion /home/hyperion &&
-      curl -sSL https://releases.hyperion-project.org/install | bash || apt-get update && apt-get -f install -y &&
-      exec sudo -u hyperion /usr/bin/hyperiond -v --service"
+      curl -sSL https://releases.hyperion-project.org/install | bash &&
+      exec sudo -u hyperion /usr/bin/hyperiond -v --service || exit 1"
     ports:
       - "19400:19400"
       - "19444:19444"

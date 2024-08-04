@@ -82,7 +82,7 @@ jobs:
             if docker container inspect -f '{{.State.Running}}' "hyperion" 2>/dev/null | grep -q "true"; then
               echo "---> Docker Container is running. Try connecting to WebUI Port 8090 ..."
               SECONDS=0
-              TIMEOUT=$((SECONDS + + 300 ))
+              TIMEOUT=500
               until [ "`curl --silent --show-error --connect-timeout 1 -I http://localhost:8090 2>/dev/null | grep 'Hyperion'`" != "" ];
               do
                 if [ "$SECONDS" -gt "$TIMEOUT" ]; then
