@@ -77,17 +77,24 @@ jobs:
           STATUS=false
           docker compose up -d --wait
           i=0
-          while [ $i -le 10 ]; do
-            i=$((i+1))
+          until [ $i -gt 10 ]; do
+            ((i++))
             if docker container inspect -f '{{.State.Running}}' hyperion; then
               echo "---> Docker Container is running. Try connecting to WebUI Port 8090 ..."
+              TIMEOUT=$(( $(date +%s) + 300 ))
               until [ "$(curl --silent --show-error --connect-timeout 1 -I http://localhost:8090 | grep 'Hyperion')" ];
               do
+                if [ $(date +%s) -gt "$TIMEOUT" ]; then
+                  echo "---> Timeout exeeded"
+                  break
+                fi
                 echo "---> Hyperion is still starting up. try again in 5 seconds ..."
                 sleep 5
               done
-              echo "---> Hyperion is up and running."
-              STATUS=true
+              if [ $(date +%s) -lt "$TIMEOUT" ]; then
+                echo "---> Hyperion is up and running."
+                STATUS=true
+              fi
               break
             else
               echo "---> Docker Container could not be found yet, try again in 5 seconds ..."
