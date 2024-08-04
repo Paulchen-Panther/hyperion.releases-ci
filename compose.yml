@@ -7,12 +7,7 @@ services:
     pull_policy: always
     environment:
       - DEBIAN_FRONTEND=noninteractive
-    command: bash -c "apt-get update && apt-get install -y wget gpg sudo dpkg apt-transport-https lsb-release &&
-      useradd --create-home --shell /bin/bash hyperion &&
-      wget -qO- https://releases.hyperion-project.org/hyperion.pub.key | sudo gpg --dearmor -o /usr/share/keyrings/hyperion.pub.gpg &&
-      echo \"deb [arch=\$(dpkg --print-architecture) [signed-by=/usr/share/keyrings/hyperion.pub.gpg] https://apt.releases.hyperion-project.org/ \$(lsb_release -cs) main\" | sudo tee /etc/apt/sources.list.d/hyperion.list &&
-      apt-get update && apt-get install -y hyperion &&
-      sudo -u hyperion /usr/bin/hyperiond -v --service"
+    command: bash -c "apt-get update && useradd --create-home --shell /bin/bash hyperion && curl -sSL https://releases.hyperion-project.org/install | bash"
     ports:
       - "19400:19400"
       - "19444:19444"
