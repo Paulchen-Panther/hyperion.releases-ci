@@ -84,15 +84,15 @@ jobs:
               echo "---> Docker Container is running. Try connecting to WebUI Port 8090 ..."
               until [ "$(curl --silent --show-error --connect-timeout 1 -I http://localhost:8090 | grep 'Hyperion')" ];
               do
-                echo "---> Hyperion is still starting up. try again in 10 seconds ..."
+                echo "---> Hyperion is still starting up. try again in 3 seconds ..."
                 docker compose logs hyperion
-                sleep 10
+                sleep 3
               done
               echo "force_build=true" >> $GITHUB_OUTPUT
             else
-              echo "---> Hyperion service could not be found yet, try again in 10 seconds ..."
+              echo "---> Hyperion service could not be found yet, try again in 3 seconds ..."
               docker compose logs hyperion
-              sleep 10
+              sleep 3
             fi
           done
           docker compose down

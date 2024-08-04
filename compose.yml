@@ -7,7 +7,7 @@ services:
     pull_policy: always
     environment:
       - DEBIAN_FRONTEND=noninteractive
-    command: bash -c "set -x && apt-get update && apt-get install wget gpg apt-transport-https lsb-release && curl -sSL https://releases.hyperion-project.org/install | bash -s -- --verbose --${distribution} ${codename}"
+    command: bash -c "set -x && apt-get update && apt-get install -y gpg apt-transport-https lsb-release && curl -sSL https://releases.hyperion-project.org/install | bash -s -- --verbose --${distribution} ${codename}"
     ports:
       - "19400:19400"
       - "19444:19444"
