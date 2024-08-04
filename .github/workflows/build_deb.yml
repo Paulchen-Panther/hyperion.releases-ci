@@ -74,7 +74,6 @@ jobs:
         working-directory: ./releases-ci/
         shell: bash
         run: |
-          set -x
           STATUS=false
           docker compose up -d --wait
           i=0
@@ -83,7 +82,7 @@ jobs:
             if docker container inspect -f '{{.State.Running}}' hyperion; then
               echo "---> Docker Container is running. Try connecting to WebUI Port 8090 ..."
               TIMEOUT=$((SECONDS + + 300 ))
-              until [ "$(curl --silent --show-error --connect-timeout 1 -I http://localhost:8090 | grep 'Hyperion')" ];
+              until [ "`curl --silent --show-error --connect-timeout 1 -I http://localhost:8090 2>/dev/null | grep 'Hyperion'`" != "" ];
               do
                 if [ "$SECONDS" -gt "$TIMEOUT" ]; then
                   echo "---> Timeout exeeded"
