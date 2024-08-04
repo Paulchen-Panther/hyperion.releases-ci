@@ -1,9 +1,8 @@
-name: hyperion
-
 services:
   hyperion:
     image: "ghcr.io/hyperion-project/${distribution}:${codename}"
     platform: "${platform}"
+    container_name: hyperion
     pull_policy: always
     environment:
       - DEBIAN_FRONTEND=noninteractive
