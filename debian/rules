@@ -8,13 +8,18 @@ TARGET := debian/tmp
 # libcec currently not linked in hyperion therefore not recognizable but hardcoded in FIND_DEPENDS
 REQUIRED_DEPS := libusb libasound libmbedtls libturbojpeg libcec
 
-# get qt version and set qt deps depending on version
-QT6_PACKAGE_VERSION := $(shell dpkg-query -W -f '$${Version}' libqt6widgets6 2>/dev/null || echo 0)
-ifeq (ok,$(shell dpkg --compare-versions $(QT6_PACKAGE_VERSION) ge 6.0 && echo ok))
-	QT_DEPS := qt6-qpa-plugins,libqt6network6,libqt6widgets6,libqt6sql6,libqt6serialport6,libqt6sql6-sqlite,
-else
-	QT_DEPS := libqt5network5,libqt5widgets5,libqt5x11extras5,libqt5sql5,libqt5serialport5,libqt5sql5-sqlite,
+# t64 packages are available?
+ifeq (ok,$(shell { dpkg-query -s libqt5widgets5t64 || dpkg -s libqt6widgets6t64; } 2>/dev/null && echo ok))
+	t64_suffix = t64
 endif
+
+# get qt version and set qt deps depending on version
+QT6_PACKAGE_VERSION := $(shell dpkg-query -W -f '$${Version}' libqt6widgets6$(t64_suffix) 2>/dev/null || echo 0)
+ifeq (ok,$(shell dpkg --compare-versions "$(QT6_PACKAGE_VERSION)" "ge" "6.0" && echo ok))
+	QT_DEPS = qt6-qpa-plugins,libqt6network6$(t64_suffix),libqt6widgets6$(t64_suffix),libqt6sql6$(t64_suffix),libqt6serialport6,libqt6sql6-sqlite$(t64_suffix),
+else
+	QT_DEPS = libqt5network5$(t64_suffix),libqt5widgets5$(t64_suffix),libqt5x11extras5,libqt5sql5$(t64_suffix),libqt5serialport5,libqt5sql5-sqlite,
+endif	
 
 FIND_DEPENDS = $(shell \
 	PACKAGES=(); \
