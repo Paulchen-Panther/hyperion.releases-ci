@@ -9,8 +9,8 @@ services:
     entrypoint: ["/bin/bash", "-c"]
     command:
       - |
-        PACKAGE_MANAGER=$([[ "${distribution}" == 'debian' || "${distribution}" == 'ubuntu' ]] && echo "apt-get" || echo "dnf")
-        $$PACKAGE_MANAGER update && $$PACKAGE_MANAGER install -y sudo lsb-release
+        [[ "${distribution}" == 'debian' || "${distribution}" == 'ubuntu' ]] && apt-get update || dnf update
+        [[ "${distribution}" == 'debian' || "${distribution}" == 'ubuntu' ]] && apt-get install -y sudo lsb-release || dnf install -y sudo lsb-release
         useradd --create-home --shell /bin/bash hyperion
         chown hyperion:hyperion /home/hyperion
         curl -sSL https://releases.hyperion-project.org/install | bash
