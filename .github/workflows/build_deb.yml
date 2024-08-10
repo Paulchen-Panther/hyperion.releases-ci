@@ -66,12 +66,12 @@ jobs:
       - name: ⬇ Checkout hyperion.releases-ci
         uses: actions/checkout@v4
         with:
-          path: releases-ci
+          path: ${{ github.workspace }}/releases-ci
 
       - name: 📥 Install & Run Check
         if: ${{ inputs.install_run_check }}
         id: install_run_check
-        working-directory: ./releases-ci/
+        working-directory: ${{ github.workspace }}/releases-ci
         shell: bash
         run: |
           STATUS=false
@@ -121,9 +121,11 @@ jobs:
           repository: ${{ inputs.repo_checkout }}
           ref: ${{ inputs.head_sha || 'master' }}
           submodules: recursive
+          path: ${{ github.workspace }}/hyperion.ng
 
       - name: 🔧 Prepare
         if: ${{ !inputs.install_run_check }}
+        working-directory: ${{ github.workspace }}/hyperion.ng
         run: |
           echo '::group::Checking the version number'
             if [[ "${{ inputs.nightly }}" = true ]]; then
@@ -133,16 +135,15 @@ jobs:
             fi
           echo '::endgroup::'
 
-          ls
-
           echo '::group::Copy debian folder'
-            cp -r ./releases-ci/debian ${GITHUB_WORKSPACE}/
+            cp -r ${{ github.workspace }}/releases-ci/debian ./
           echo '::endgroup::'
 
       - name: 👷 Build
         if: ${{ !inputs.install_run_check }}
-        uses: ./releases-ci/.github/actions/build
+        uses: ${{ github.workspace }}/releases-ci/.github/actions/build
         with:
+          workingDirectory: ${{ github.workspace }}/hyperion.ng
           distribution: ${{ matrix.os.distribution }}
           codename: ${{ matrix.os.codename }}
           architecture: ${{ matrix.architecture[0] }}
@@ -154,5 +155,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ format('artifact-{0}_{1}_{2}{3}', matrix.os.distribution, matrix.os.codename, matrix.architecture[0], matrix.os.qt_version  == '6' && '_qt6' || '')}}
-          path: ${{ github.workspace }}/deploy
+          path: ${{ github.workspace }}/hyperion.ng/deploy
           retention-days: 1
