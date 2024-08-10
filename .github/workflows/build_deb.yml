@@ -121,27 +121,28 @@ jobs:
           repository: ${{ inputs.repo_checkout }}
           ref: ${{ inputs.head_sha || 'master' }}
           submodules: recursive
-          clean: false
+          path: hyperion.ng
 
       - name: 🔧 Prepare
         if: ${{ !inputs.install_run_check }}
         run: |
           echo '::group::Checking the version number'
             if [[ "${{ inputs.nightly }}" = true ]]; then
-              echo "$(tr -d '\n' < .version)+nightly$(date '+%Y%m%d')${{ inputs.head_sha }}" > .version
+              echo "$(tr -d '\n' < ./hyperion.ng/.version)+nightly$(date '+%Y%m%d')${{ inputs.head_sha }}" > ./hyperion.ng/.version
             else
-              tr -d '\n' < .version > temp && mv temp .version
+              tr -d '\n' < ./hyperion.ng/.version > temp && mv temp ./hyperion.ng/.version
             fi
           echo '::endgroup::'
 
           echo '::group::Copy debian folder'
-            cp -r ./releases-ci/debian ${GITHUB_WORKSPACE}/
+            cp -r ./releases-ci/debian ./hyperion.ng/
           echo '::endgroup::'
 
       - name: 👷 Build
         if: ${{ !inputs.install_run_check }}
         uses: ./releases-ci/.github/actions/build
         with:
+          workingDirectory: ./hyperion.ng/
           distribution: ${{ matrix.os.distribution }}
           codename: ${{ matrix.os.codename }}
           architecture: ${{ matrix.architecture[0] }}
@@ -153,5 +154,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ${{ format('artifact-{0}_{1}_{2}{3}', matrix.os.distribution, matrix.os.codename, matrix.architecture[0], matrix.os.qt_version  == '6' && '_qt6' || '')}}
-          path: ${{ github.workspace }}/deploy
+          path: ./hyperion.ng/deploy
           retention-days: 1
