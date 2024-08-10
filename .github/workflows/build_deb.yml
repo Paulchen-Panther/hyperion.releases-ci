@@ -89,7 +89,7 @@ jobs:
                   echo "---> Timeout exeeded"
                   break
                 fi
-                echo -e "\e[1A\e[K---> Docker Container is running. Try connecting to WebUI Port 8090 ... (${SECONDS}/${TIMEOUT})"
+                echo "---> Hyperion is still starting up, try again in 5 seconds ... (${SECONDS}/${TIMEOUT})"
                 sleep 5
               done
               if [ "$SECONDS" -lt "$TIMEOUT" ]; then
