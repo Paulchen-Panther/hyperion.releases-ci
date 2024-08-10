@@ -6,7 +6,7 @@ services:
     pull_policy: always
     environment:
       - DEBIAN_FRONTEND=noninteractive
-    command:
+    command: |
       /bin/bash -c "
       if [[ '${distribution}' == 'debian' ]] || [[ '${distribution}' == 'debian' ]]; then
         apt-get update
