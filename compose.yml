@@ -6,10 +6,15 @@ services:
     pull_policy: always
     environment:
       - DEBIAN_FRONTEND=noninteractive
-    command: /bin/bash -c "apt-get update && apt-get install -y sudo gpg apt-transport-https lsb-release &&
-      useradd --create-home --shell /bin/bash hyperion && chown hyperion:hyperion /home/hyperion &&
-      curl -sSL https://releases.hyperion-project.org/install | bash &&
-      exec sudo -u hyperion /usr/bin/hyperiond -v --service"
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - |
+        PACKAGE_MANAGER=$([[ "${distribution}" == 'debian' || "${distribution}" == 'ubuntu' ]] && echo "apt-get" || echo "dnf")
+        ${PACKAGE_MANAGER} update && ${PACKAGE_MANAGER} install -y sudo lsb-release
+        useradd --create-home --shell /bin/bash hyperion
+        chown hyperion:hyperion /home/hyperion
+        curl -sSL https://releases.hyperion-project.org/install | bash
+        exec sudo -u hyperion /usr/bin/hyperiond -v --service
     ports:
       - "19400:19400"
       - "19444:19444"

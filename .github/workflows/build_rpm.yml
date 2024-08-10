@@ -21,7 +21,7 @@ on:
       install_run_check:
         type: boolean
         description: Install & Run Check
-        default: false
+        default: true
         required: false
       upload:
         type: boolean
@@ -50,11 +50,51 @@ jobs:
         with:
           path: releases-ci
 
-      # TODO
-      # - name: 📥 Install & Run Check
-      #   if: ${{ inputs.install_run_check }}
-      #   id: install_run_check
-      #   run: |
+      - name: 📥 Install & Run Check
+        if: ${{ inputs.install_run_check }}
+        id: install_run_check
+        working-directory: ./releases-ci/
+        shell: bash
+        run: |
+          STATUS=false
+          docker compose up -d --wait
+          i=0
+          while [ $i -le 10 ]; do
+            i=$((i+1))
+            if docker container inspect -f '{{.State.Running}}' "hyperion" 2>/dev/null | grep -q "true"; then
+              echo "---> Docker Container is running. Try connecting to WebUI Port 8090 ..."
+              SECONDS=0
+              TIMEOUT=500
+              until [ "`curl --silent --show-error --connect-timeout 1 -I http://localhost:8090 2>/dev/null | grep 'Hyperion'`" != "" ];
+              do
+                if [ "$SECONDS" -gt "$TIMEOUT" ]; then
+                  echo "---> Timeout exeeded"
+                  break
+                fi
+                echo "---> Hyperion is still starting up, try again in 5 seconds ... (${SECONDS}/${TIMEOUT})"
+                sleep 5
+              done
+              if [ "$SECONDS" -lt "$TIMEOUT" ]; then
+                echo "---> Hyperion is up and running."
+                STATUS=true
+              fi
+              break
+            else
+              echo "---> Docker Container could not be found yet, try again in 5 seconds ..."
+              sleep 5
+            fi
+          done
+          echo "---> Docker compose log:"
+          docker compose logs hyperion
+          docker compose down
+          if [ "$STATUS" = false ] ; then
+            echo "---> Hyperion could not be started."
+            exit 1
+          fi
+        env:
+          distribution: ${{ matrix.os.distribution }}
+          codename: ${{ matrix.os.qt_version == '6' && format('{0}-qt6', matrix.os.codename) || matrix.os.codename }}
+          platform: ${{ matrix.architecture[1] }}
 
       - name: ⬇ Checkout hyperion.ng
         if: ${{ !inputs.install_run_check }}
