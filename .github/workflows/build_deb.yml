@@ -142,7 +142,7 @@ jobs:
         if: ${{ !inputs.install_run_check }}
         uses: ./releases-ci/.github/actions/build
         with:
-          workingDirectory: ./hyperion.ng/
+          workingDirectory: ${{ github.workspace }}/hyperion.ng/
           distribution: ${{ matrix.os.distribution }}
           codename: ${{ matrix.os.codename }}
           architecture: ${{ matrix.architecture[0] }}
