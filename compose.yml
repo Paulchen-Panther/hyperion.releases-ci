@@ -8,7 +8,7 @@ services:
       - DEBIAN_FRONTEND=noninteractive
     command: |
       /bin/bash -c "
-      if [[ '${distribution}' == 'debian' ]] || [[ '${distribution}' == 'debian' ]]; then
+      if [[ '${distribution}' == 'debian' ]] || [[ '${distribution}' == 'ubuntu' ]]; then
         apt-get update
         apt-get install -y sudo lsb-release
       else
