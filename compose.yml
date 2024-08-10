@@ -9,7 +9,7 @@ services:
     entrypoint: ["/bin/bash", "-c"]
     command:
       - |
-        if [[ "${distribution}" == 'debian' || "${distribution}" == 'ubuntu' ]]; then
+        if [[ "${distribution}" == "debian" ]] || [[ "${distribution}" == "ubuntu" ]]; then
           apt-get update && apt-get install -y sudo lsb-release;
         else
           dnf update && dnf install -y sudo lsb-release;
