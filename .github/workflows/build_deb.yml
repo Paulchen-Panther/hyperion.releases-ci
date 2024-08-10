@@ -134,7 +134,7 @@ jobs:
           echo '::endgroup::'
 
           echo '::group::Copy debian folder'
-            cp -r releases-ci/debian ${GITHUB_WORKSPACE}/
+            cp -r ./releases-ci/debian ${GITHUB_WORKSPACE}/
           echo '::endgroup::'
 
       - name: 👷 Build
