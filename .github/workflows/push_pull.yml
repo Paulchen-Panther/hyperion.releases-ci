@@ -19,12 +19,12 @@ jobs:
     with:
       upload: true
 
-  rpm_build:
-    name: 👷 Build RPM Packages
-    uses: ./.github/workflows/build_rpm.yml
-    secrets: inherit
-    with:
-      upload: true
+  # rpm_build:
+  #   name: 👷 Build RPM Packages
+  #   uses: ./.github/workflows/build_rpm.yml
+  #   secrets: inherit
+  #   with:
+  #     upload: true
 
   # publish_test:
   #   name: 🚀 Create Repository Structure (Test)
