@@ -133,6 +133,8 @@ jobs:
             fi
           echo '::endgroup::'
 
+          ls
+
           echo '::group::Copy debian folder'
             cp -r ./releases-ci/debian ${GITHUB_WORKSPACE}/
           echo '::endgroup::'
