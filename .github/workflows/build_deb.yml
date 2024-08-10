@@ -21,7 +21,7 @@ on:
       install_run_check:
         type: boolean
         description: Install & Run Check
-        default: true
+        default: false
         required: false
       upload:
         type: boolean
