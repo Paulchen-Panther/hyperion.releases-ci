@@ -4,11 +4,10 @@ services:
     platform: "${platform}"
     container_name: hyperion
     pull_policy: always
-    environment:
-      - DEBIAN_FRONTEND=noninteractive
     command: |
       /bin/bash -c "
       if [[ '${distribution}' == 'debian' ]] || [[ '${distribution}' == 'ubuntu' ]]; then
+        export DEBIAN_FRONTEND=noninteractive
         apt-get update
         apt-get install -y sudo lsb-release
       else

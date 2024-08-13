@@ -26,8 +26,8 @@ jobs:
     with:
       upload: true
 
-  # publish_test:
-  #   name: 🚀 Create Repository Structure (Test)
-  #   needs: [ deb_build, rpm_build ]
-  #   uses: ./.github/workflows/publish_deb_rpm.yml
-  #   secrets: inherit
+  publish_test:
+    name: 🚀 Create Repository Structure (Test)
+    needs: [ deb_build, rpm_build ]
+    uses: ./.github/workflows/publish_deb_rpm.yml
+    secrets: inherit
