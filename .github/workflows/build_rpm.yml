@@ -111,7 +111,7 @@ jobs:
         run: |
           echo '::group::Checking the version number'
             if [[ "${{ inputs.nightly }}" = true ]]; then
-              echo "$(tr -d '\n' < ./hyperion.ng/.version)+nightly$(date '+%Y%m%d')${{ inputs.head_sha }}" > ./hyperion.ng/.version
+              echo "$(tr -d '\n' < ./hyperion.ng/.version | sed s/~/_/g)^nightly$(date '+%Y%m%d')${{ inputs.head_sha }}" > ./hyperion.ng/.version
             else
               tr -d '\n' < ./hyperion.ng/.version > temp && mv temp ./hyperion.ng/.version
             fi
