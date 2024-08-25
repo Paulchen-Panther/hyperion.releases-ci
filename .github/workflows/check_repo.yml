@@ -1,24 +1,38 @@
 name: Repository Check
 run-name: '⏰ Repository Check (Install & Run)'
 
-# Install & Run Check the APT/RPM Repository at the end of every day
 on:
   schedule:
     - cron: '0 0 * * *'
   workflow_dispatch:
 
 jobs:
-  deb_check:
-    name: 👷 APT Repository
+  deb_stable_check:
+    name: 👷 APT Repository (Stable)
     uses: ./.github/workflows/build_deb.yml
     secrets: inherit
     with:
       install_run_check: true
 
-  rpm_check:
-    name: 👷 DNF Repository
+  deb_nightly_check:
+    name: 👷 APT Repository (Nightly)
+    uses: ./.github/workflows/build_deb.yml
+    secrets: inherit
+    with:
+      install_run_check: true
+      nightly: true
+
+  rpm_stable_check:
+    name: 👷 DNF Repository (Stable)
     uses: ./.github/workflows/build_rpm.yml
     secrets: inherit
     with:
       install_run_check: true
 
+  rpm_nightly_check:
+    name: 👷 DNF Repository (Nightly)
+    uses: ./.github/workflows/build_rpm.yml
+    secrets: inherit
+    with:
+      install_run_check: true
+      nightly: true
