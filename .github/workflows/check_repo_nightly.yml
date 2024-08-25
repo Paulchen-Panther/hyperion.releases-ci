@@ -5,6 +5,7 @@ run-name: '🌑️ Nightly Repository Check (Install & Run)'
 on:
   schedule:
     - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   deb_check:
