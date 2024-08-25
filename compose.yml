@@ -16,7 +16,7 @@ services:
       fi
       useradd --create-home --shell /bin/bash hyperion
       chown hyperion:hyperion /home/hyperion
-      curl -sSL https://releases.hyperion-project.org/install | bash
+      curl -sSL https://releases.hyperion-project.org/install | ${bash}
       exec sudo -u hyperion /usr/bin/hyperiond -v --service"
     ports:
       - "19400:19400"

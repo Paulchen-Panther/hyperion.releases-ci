@@ -1,0 +1,24 @@
+name: Repository Check
+run-name: '🌑️ Nightly Repository Check (Install & Run)'
+
+# Install & Run Check the Nightly APT/RPM Repository at the end of every day
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  deb_check:
+    name: 👷 APT Repository
+    uses: ./.github/workflows/build_deb.yml
+    secrets: inherit
+    with:
+      install_run_check: true
+      nightly: true
+
+  rpm_check:
+    name: 👷 DNF Repository
+    uses: ./.github/workflows/build_rpm.yml
+    secrets: inherit
+    with:
+      install_run_check: true
+      nightly: true

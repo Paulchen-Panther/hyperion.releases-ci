@@ -95,6 +95,7 @@ jobs:
           distribution: ${{ matrix.os.distribution }}
           codename: ${{ matrix.os.qt_version == '6' && format('{0}-qt6', matrix.os.version) || matrix.os.version }}
           platform: ${{ matrix.architecture[1] }}
+          bash: ${{ inputs.nightly == 'true' && 'bash -s -- --nightly') || 'bash' }}
 
       - name: ⬇ Checkout hyperion.ng
         if: ${{ !inputs.install_run_check }}
