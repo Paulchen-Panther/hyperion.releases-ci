@@ -1,4 +1,4 @@
-name: Repository Check
+name: Nightly Repository Check
 run-name: '🌑️ Nightly Repository Check (Install & Run)'
 
 # Install & Run Check the Nightly APT/RPM Repository at the end of every day
