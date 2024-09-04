@@ -9,11 +9,11 @@ TARGET := debian/tmp
 REQUIRED_DEPS := libusb libasound libmbedtls libturbojpeg libcec
 
 # get qt version and set qt deps depending on version
-QT6_PACKAGE_VERSION := $(shell dpkg-query -W -f '$${Version}' libqt6widgets6* 2>/dev/null || echo 0)
-ifeq (ok,$(shell dpkg --compare-versions "$(QT6_PACKAGE_VERSION)" "ge" "6.0" && echo ok))
-	QT_DEPS = qt6-qpa-plugins, libqt6network6 | libqt6network6t64, libqt6widgets6 | libqt6widgets6t64, libqt6sql6 | libqt6sql6t64, libqt6serialport6, libqt6sql6-sqlite | libqt6sql6-sqlitet64,
-else
-	QT_DEPS = libqt5network5 | libqt5network5t64, libqt5widgets5 | libqt5widgets5t64, libqt5x11extras5, libqt5sql5 | libqt5sql5t64,libqt5serialport5,libqt5sql5-sqlite,
+QT6_PACKAGE_VERSION := $(shell dpkg-query -W -f '$${Version}' libqt6widgets6* &>/dev/null || echo 0)
+ifeq (ok,$(shell dpkg --compare-versions $(QT6_PACKAGE_VERSION) ge 6.0 && echo ok))
+	QT_DEPS := qt6-qpa-plugins libqt6network6 libqt6widgets6 libqt6sql6 libqt6serialport6 libqt6sql6-sqlite
+else 
+	QT_DEPS := libqt5network5 libqt5widgets5 libqt5x11extras5 libqt5sql5 libqt5serialport5 libqt5sql5-sqlite
 endif
 
 FIND_DEPENDS = $(shell \
@@ -30,6 +30,9 @@ FIND_DEPENDS = $(shell \
 				break; \
 			fi; \
 		done; \
+	done; \
+	for QT_DEP in $(QT_DEPS); do \
+		RESULT+=("$$(dpkg -S $$(basename "$$QT_DEP") 2>/dev/null | cut -d : -f 1 | sed '/-dev/d' | head -1)"); \
 	done; \
 	printf '%s,' "$${RESULT[@]}" \
 )
@@ -55,7 +58,7 @@ binary:
 	[ -d $(TARGET)/DEBIAN ] || mkdir -p $(TARGET)/DEBIAN
 	cp -rf cmake/package-scripts/* $(TARGET)/DEBIAN/
 	chmod 0775 $(TARGET)/DEBIAN/*
-	dpkg-gencontrol -phyperion "-Vdist:Depends=$(QT_DEPS)$(DETERMINED_DEPS)"
+	dpkg-gencontrol -phyperion "-Vdist:Depends=$(DETERMINED_DEPS)"
 	dpkg-deb --build $(TARGET) ..
 
 clean:
