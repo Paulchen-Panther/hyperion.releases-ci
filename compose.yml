@@ -6,14 +6,6 @@ services:
     pull_policy: always
     command: |
       /bin/bash -c "
-      if [[ '${distribution}' == 'debian' ]] || [[ '${distribution}' == 'ubuntu' ]]; then
-        export DEBIAN_FRONTEND=noninteractive
-        apt-get update
-        apt-get install -y sudo lsb-release
-      else
-        dnf update
-        dnf install -y sudo lsb-release
-      fi
       useradd --create-home --shell /bin/bash hyperion
       chown hyperion:hyperion /home/hyperion
       curl -sSL https://releases.hyperion-project.org/install | ${bash}
