@@ -38,7 +38,7 @@ FIND_DEPENDS = $(shell \
 	printf '%s,' "$${RESULT[@]}" \
 )
 
-CMAKE_ENVIRONMENT := -DUSE_SYSTEM_MBEDTLS_LIBS=ON -DENABLE_DEPLOY_DEPENDENCIES=OFF -DCMAKE_BUILD_TYPE=Release
+CMAKE_ENVIRONMENT := -DUSE_SYSTEM_MBEDTLS_LIBS=ON -DENABLE_DEPLOY_DEPENDENCIES=OFF -DCMAKE_BUILD_TYPE=Debug
 
 ifeq ($(shell dpkg-vendor --query Vendor),Ubuntu)
 	ifneq ($(filter arm64 armhf,$(shell dpkg-architecture -qDEB_HOST_ARCH)),)

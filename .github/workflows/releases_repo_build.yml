@@ -28,10 +28,10 @@ jobs:
       upload: true
 
   # Publish RPM Packages to DNF Repository
-  publish_packages:
-    name: 🚀 Publish Packages
-    needs: build_packages
-    uses: ./.github/workflows/publish_deb_rpm.yml
-    secrets: inherit
-    with:
-      publish: false
+  # publish_packages:
+  #   name: 🚀 Publish Packages
+  #   needs: build_packages
+  #   uses: ./.github/workflows/publish_deb_rpm.yml
+  #   secrets: inherit
+  #   with:
+  #     publish: false
