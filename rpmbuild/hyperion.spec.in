@@ -38,11 +38,11 @@ BuildRequires:	systemd-devel
 BuildRequires:  protobuf-devel
 BuildRequires:  flatbuffers-devel
 BuildRequires:  xcb-util-image-devel xcb-util-devel
+BuildRequires:  desktop-file-utils
 
 # fedora/rhel build dependencies
 %if %{is_fedora_or_rhel}
 BuildRequires:  ninja-build
-BuildRequires:  desktop-file-utils
 BuildRequires:  libappstream-glib
 BuildRequires:  python3-devel
 BuildRequires:  turbojpeg-devel libjpeg-turbo-devel
@@ -58,7 +58,7 @@ BuildRequires:  flatbuffers-compiler
 # openSUSE Leap build dependencies
 %if %{is_suse_leap}
 BuildRequires:  ninja
-BuildRequires:  update-desktop-files
+BuildRequires:  appstream-glib
 BuildRequires:  python3-devel
 BuildRequires:  avahi-compat-mDNSResponder-devel
 BuildRequires:  systemd-rpm-macros
@@ -117,10 +117,7 @@ cmake --build build --parallel $(nproc)
 %check
   # check Desktop/AppStream file
   desktop-file-validate %{buildroot}%{_datadir}/%{name}/desktop/%{name}.desktop
-  %if %{is_fedora_or_rhel}
-    appstream-util validate-relax --nonet %{buildroot}%{_datadir}/%{name}/desktop/%{name}.metainfo.xml 
-  %endif
-  
+  appstream-util validate-relax --nonet %{buildroot}%{_datadir}/%{name}/desktop/%{name}.metainfo.xml 
 
 %pre
 # stop running daemon before we install/upgrade
