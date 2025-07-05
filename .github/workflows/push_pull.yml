@@ -18,6 +18,8 @@ jobs:
     secrets: inherit
     with:
       upload: true
+      repo_checkout: paulchen-panther/hyperion.ng
+      head_sha: fedora
 
   publish_test:
     name: 🚀 Create Repository Structure (Test)
