@@ -106,6 +106,7 @@ jobs:
           qtVersion: ${{ matrix.os.codename == 'bullseye' && matrix.architecture[0] == 'armhf' && '5' || matrix.os.qt_version }} # Debian Bullseye does not provide Qt6 on armv6
           dockerArchitecture: ${{ matrix.architecture[1] }}
           dockerEntrypoint: ${{ matrix.architecture[0] != 'amd64' && '--entrypoint /usr/bin/env' || '' }}
+          ghcr: paulchen-panther
 
       - name: 📦 Upload
         if: ${{ inputs.upload }}
