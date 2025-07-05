@@ -13,9 +13,6 @@
 # openSUSE Leap >= 15.4
 %define is_suse_leap (0%{?is_opensuse} && 0%{?sle_version} >= 150400)
 
-# openSUSE Tumbleweed
-# %define is_suse_tumbleweed (0%{?sle_version} == 0 && 0%{?suse_version} >= 1600)
-
 Name:           hyperion
 Version:        %{?hyperion_version}%{!?hyperion_version:UNDEFINED}
 Release:        0%{?dist}
@@ -65,7 +62,7 @@ BuildRequires:  update-desktop-files
 BuildRequires:  python3-devel
 BuildRequires:  avahi-compat-mDNSResponder-devel
 BuildRequires:  systemd-rpm-macros
-BuildRequires:  qt6-base-common-devel libQt6Network6 libQt6Sql6 libQt6SerialPort6 libQt6WebSockets6
+BuildRequires:  qt6-base-devel qt6-base-common-devel qt6-core-devel qt6-gui-devel qt6-imageformats-devel qt6-serialport-devel qt6-websockets-devel
 BuildRequires:  libftdi1-devel
 BuildRequires:  dbus-1-devel
 BuildRequires:  libusb-1_0-devel
